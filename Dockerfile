@@ -1,5 +1,5 @@
-# Java 17 slim 이미지 사용
-FROM openjdk:17-jdk-slim
+# 안정적이고 ARM/x86 호환되는 OpenJDK 17 이미지
+FROM eclipse-temurin:17-jdk-jammy
 
 # 작업 디렉터리 설정
 WORKDIR /app
