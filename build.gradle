@@ -1,0 +1,51 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.7'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.nhs'
+version = '0.0.1-SNAPSHOT'
+description = 'My own space project for Spring Boot'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+    // 웹 서버(Tomcat) + MVC
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+    // JPA(Hibernate)로 DB 매핑/쿼리
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    // MySQL 연동용 드라이버 추가
+    //runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // Postgresql 연동용 드라이버 추가
+    runtimeOnly 'org.postgresql:postgresql'
+
+
+    // Lombok
+    // 보일러플레이트 코드 제거
+    compileOnly 'org.projectlombok:lombok'
+    // Lombok 애노테이션 처리기
+	annotationProcessor 'org.projectlombok:lombok'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
