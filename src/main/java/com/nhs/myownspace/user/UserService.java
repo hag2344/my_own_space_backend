@@ -1,6 +1,6 @@
 package com.nhs.myownspace.user;
 
-import com.nhs.myownspace.common.AuthUtil;
+import com.nhs.myownspace.common.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
