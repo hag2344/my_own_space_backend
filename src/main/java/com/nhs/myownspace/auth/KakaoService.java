@@ -123,7 +123,17 @@ public class KakaoService {
                     : null;
             String providerId = String.valueOf(body.get("id"));
             String nickname = profile != null ? (String) profile.get("nickname") : "사용자";
+            // 최신 카카오 프로필 키
             String profileImage = profile != null ? (String) profile.get("profile_image_url") : null;
+            // 구버전 카카오 프로필 키
+            if (profileImage == null) {
+                profileImage = profile != null ? (String) profile.get("profile_image") : null;
+            }
+            // HTTP → HTTPS 변환
+            if (profileImage != null && profileImage.startsWith("http://")) {
+                profileImage = profileImage.replace("http://", "https://");
+            }
+
             log.debug("카카오 사용자 정보 파싱 완료 - providerId: {}", providerId);
             return Map.of(
                     "providerId", providerId,
