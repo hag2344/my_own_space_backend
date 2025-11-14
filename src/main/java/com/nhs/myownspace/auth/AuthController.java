@@ -52,5 +52,14 @@ public class AuthController {
     public ResponseEntity<?> logout() {
         return authService.logout();
     }
+
+    /**
+     *  현재 서버 ON/OFF 조회
+     */
+    @GetMapping("/server/state")
+    public String serverState() {
+        return "ON";
+    }
+
 }
 
