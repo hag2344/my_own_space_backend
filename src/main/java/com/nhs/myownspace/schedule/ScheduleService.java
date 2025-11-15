@@ -43,7 +43,6 @@ public class ScheduleService {
      * 일정 생성
      */
     public Schedule create(ScheduleRequest req) {
-
         var userInfo = AuthUtil.getLoginUser();
         if (userInfo == null) return null;
 
@@ -55,8 +54,8 @@ public class ScheduleService {
                     .provider(provider)
                     .providerId(providerId)
                     .title(req.getTitle())
-                    .startDate(req.getStart())
-                    .endDate(req.getEnd())
+                    .startDate(req.getStartDate())
+                    .endDate(req.getEndDate())
                     .allDay(req.isAllDay())
                     .location(req.getLocation())
                     .color(req.getColor())
@@ -83,8 +82,8 @@ public class ScheduleService {
             }
 
             schedule.setTitle(req.getTitle());
-            schedule.setStartDate(req.getStart());
-            schedule.setEndDate(req.getEnd());
+            schedule.setStartDate(req.getStartDate());
+            schedule.setEndDate(req.getEndDate());
             schedule.setAllDay(req.isAllDay());
             schedule.setLocation(req.getLocation());
             schedule.setColor(req.getColor());

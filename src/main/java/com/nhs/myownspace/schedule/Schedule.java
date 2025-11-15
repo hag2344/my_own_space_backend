@@ -4,6 +4,8 @@ import com.nhs.myownspace.user.Provider;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor @Builder
@@ -31,7 +33,7 @@ public class Schedule {
     private String startDate;
 
     @Column(name = "end_date")
-    private String endDate;
+    private String  endDate;
 
     @Column(name = "all_day")
     private boolean allDay;
