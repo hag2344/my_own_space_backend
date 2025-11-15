@@ -61,5 +61,10 @@ public class AuthController {
         return "ON";
     }
 
+    @GetMapping("/server/alive")
+    public ResponseEntity<?> keepAlive() {
+        return ResponseEntity.ok(Map.of("status", "alive"));
+    }
+
 }
 
