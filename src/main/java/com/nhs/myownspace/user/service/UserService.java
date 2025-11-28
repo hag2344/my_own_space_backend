@@ -1,9 +1,14 @@
-package com.nhs.myownspace.user;
+package com.nhs.myownspace.user.service;
 
-import com.nhs.myownspace.common.util.AuthUtil;
+import com.nhs.myownspace.global.util.AuthUtil;
+import com.nhs.myownspace.user.Provider;
+import com.nhs.myownspace.user.dto.UserMapper;
+import com.nhs.myownspace.user.entity.User;
+import com.nhs.myownspace.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import com.nhs.myownspace.user.dto.UserResponseDto;
 
 import java.util.Map;
 
@@ -16,7 +21,7 @@ public class UserService {
     /**
      * 로그인된 사용자 정보를 기반으로 DB 조회
      */
-    public Map<String, Object> getMyInfo() {
+    public UserResponseDto getMyInfo() {
 
         // SecurityContext에서 로그인 정보 가져오기
         var userInfo = AuthUtil.getLoginUser();
@@ -38,10 +43,6 @@ public class UserService {
 
         log.info("사용자 정보 조회 성공 - providerId: {}", providerId);
 
-        return Map.of(
-                "nickname", user.getNickname(),
-                "profileImage", user.getProfileImage(),
-                "provider", provider.name()
-        );
+        return UserMapper.responseDto(user);
     }
 }

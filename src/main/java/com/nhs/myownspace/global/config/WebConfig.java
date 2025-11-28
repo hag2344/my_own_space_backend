@@ -1,4 +1,4 @@
-package com.nhs.myownspace.config;
+package com.nhs.myownspace.global.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

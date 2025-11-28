@@ -1,6 +1,6 @@
-package com.nhs.myownspace.security;
+package com.nhs.myownspace.auth.filter;
 
-import com.nhs.myownspace.auth.JwtService;
+import com.nhs.myownspace.auth.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;

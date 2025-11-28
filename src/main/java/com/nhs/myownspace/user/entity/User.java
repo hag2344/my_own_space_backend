@@ -1,5 +1,6 @@
-package com.nhs.myownspace.user;
+package com.nhs.myownspace.user.entity;
 
+import com.nhs.myownspace.user.Provider;
 import jakarta.persistence.*;
 import lombok.*;
 

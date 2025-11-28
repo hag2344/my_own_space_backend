@@ -1,4 +1,4 @@
-package com.nhs.myownspace.auth;
+package com.nhs.myownspace.auth.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -8,7 +8,8 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
-import com.nhs.myownspace.common.util.UrlUtil;
+import com.nhs.myownspace.global.util.UrlUtil;
+import com.nhs.myownspace.auth.dto.KakaoUserInfoDto;
 
 @Slf4j
 @Service
@@ -26,7 +27,7 @@ public class KakaoService {
     /**
      * 인가 코드로 카카오 사용자 정보 조회
      */
-    public Map<String, Object> getUserInfoFromCode(String code){
+    public KakaoUserInfoDto getUserInfoFromCode(String code){
         try {
             log.info("카카오 로그인 요청 시작 - code: {}", code);
             String accessToken = getAccessToken(code);
@@ -34,14 +35,8 @@ public class KakaoService {
                 log.warn("Access Token 발급 실패 - code: {}", code);
                 return null;
             }
-            Map<String, Object> userInfo = getUserProfile(accessToken);
-            if (userInfo == null) {
-                log.warn("카카오 사용자 정보 조회 실패 - code: {}", code);
-                return null;
-            }
 
-            log.info("카카오 사용자 정보 조회 성공 - kakaoId: {}", userInfo.get("providerId"));
-            return userInfo;
+            return getUserProfile(accessToken);
 
         } catch (Exception e){
             log.error("카카오 사용자 정보 조회 중 오류 발생: {}", e.getMessage(), e);
@@ -92,7 +87,7 @@ public class KakaoService {
      * Access Token 으로 사용자 프로필 조회
      */
     @SuppressWarnings("unchecked")
-    private Map<String, Object> getUserProfile(String accessToken){
+    private KakaoUserInfoDto getUserProfile(String accessToken){
         try{
             RestTemplate restTemplate = new RestTemplate();
 
@@ -118,28 +113,30 @@ public class KakaoService {
                 return null;
             }
 
+            String providerId = String.valueOf(body.get("id"));
+
             Map<String, Object> kakaoAccount = (Map<String, Object>) body.get("kakao_account");
             Map<String, Object> profile = kakaoAccount != null
                     ? (Map<String, Object>) kakaoAccount.get("profile")
                     : null;
-            String providerId = String.valueOf(body.get("id"));
+
             String nickname = profile != null ? (String) profile.get("nickname") : "사용자";
-            // 최신 카카오 프로필 키
-            String profileImage = profile != null ? UrlUtil.forceHttps((String) profile.get("profile_image_url")) : null;
-            // 구버전 카카오 프로필 키
-            if (profileImage == null) {
-                profileImage = profile != null ? UrlUtil.forceHttps((String) profile.get("profile_image")) : null;
-            }
-            if (profileImage == null) {
-                profileImage = profile != null ? UrlUtil.forceHttps((String) profile.get("thumbnail_image_url")) : null;
+            String profileImage = null;
+
+            if (profile != null){
+                // 최신 카카오 프로필 키
+                profileImage = UrlUtil.forceHttps((String) profile.get("profile_image_url"));
+                // 구버전 카카오 프로필 키
+                if (profileImage == null){
+                    profileImage = UrlUtil.forceHttps((String) profile.get("profile_image"));
+                }
+                if (profileImage == null){
+                    profileImage = UrlUtil.forceHttps((String) profile.get("thumbnail_image_url"));
+                }
             }
 
             log.debug("카카오 사용자 정보 파싱 완료 - providerId: {}", providerId);
-            return Map.of(
-                    "providerId", providerId,
-                    "nickname", nickname,
-                    "profileImage", profileImage
-            );
+            return new KakaoUserInfoDto(providerId, nickname, profileImage);
 
         } catch (HttpClientErrorException e) {
             log.error("카카오 사용자 정보 요청 실패 (4xx): {}", e.getResponseBodyAsString(), e);

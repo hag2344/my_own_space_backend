@@ -1,4 +1,4 @@
-package com.nhs.myownspace.common.util;
+package com.nhs.myownspace.global.util;
 
 public class UrlUtil {
     private UrlUtil() {

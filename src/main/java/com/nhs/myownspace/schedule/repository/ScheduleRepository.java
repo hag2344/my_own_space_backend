@@ -1,5 +1,6 @@
-package com.nhs.myownspace.schedule;
+package com.nhs.myownspace.schedule.repository;
 
+import com.nhs.myownspace.schedule.entity.Schedule;
 import com.nhs.myownspace.user.Provider;
 import org.springframework.data.jpa.repository.JpaRepository;
 

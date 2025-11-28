@@ -1,6 +1,6 @@
-package com.nhs.myownspace.config;
+package com.nhs.myownspace.global.config;
 
-import com.nhs.myownspace.security.JwtAuthenticationFilter;
+import com.nhs.myownspace.auth.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -33,8 +33,9 @@ public class SecurityConfig {
                 // 인증/인가 설정
                 .authorizeHttpRequests(auth -> auth
                         // 인증 없이 접근 가능한 경로
+                        // 로그인, 카카오 인증 등 허용
                         .requestMatchers(
-                                "/api/auth/**", //  로그인, 카카오 인증 등 허용
+                                "/api/auth/**",
                                 "/api/oauth/**"
                         ).permitAll()
                         // 나머지는 인증 필요

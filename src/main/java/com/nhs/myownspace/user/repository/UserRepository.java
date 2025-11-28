@@ -1,5 +1,7 @@
-package com.nhs.myownspace.user;
+package com.nhs.myownspace.user.repository;
 
+import com.nhs.myownspace.user.Provider;
+import com.nhs.myownspace.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 

@@ -1,4 +1,4 @@
-package com.nhs.myownspace.auth;
+package com.nhs.myownspace.auth.service;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.Date;
-import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -140,6 +139,11 @@ public class JwtService {
      */
     public String extractClaim(String token, String keyName) {
         try {
+            if (token == null || token.isEmpty()) {
+                log.warn("토큰이 비어 있어 claims 추출 불가");
+                return null;
+            }
+
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
