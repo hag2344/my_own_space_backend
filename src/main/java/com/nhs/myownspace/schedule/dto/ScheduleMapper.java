@@ -1,6 +1,5 @@
 package com.nhs.myownspace.schedule.dto;
 
-
 import com.nhs.myownspace.global.util.DateFormatUtil;
 import com.nhs.myownspace.schedule.entity.Schedule;
 import com.nhs.myownspace.user.Provider;
