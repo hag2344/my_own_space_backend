@@ -2,6 +2,7 @@ package com.nhs.myownspace.global.util;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public class DateFormatUtil {
 
@@ -21,6 +22,18 @@ public class DateFormatUtil {
 
         // 날짜+시간
         return LocalDateTime.parse(value);
+    }
+
+    public static LocalDate toDate(String value) {
+        if (value == null || value.isEmpty())
+            return null;
+        return LocalDate.parse(value);
+    }
+
+    public static LocalTime toTime(String value) {
+        if (value == null || value.isEmpty())
+            return null;
+        return LocalTime.parse(value);
     }
 
     public static String toStr(LocalDateTime dt, boolean allDay) {
