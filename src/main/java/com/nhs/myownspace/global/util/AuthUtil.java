@@ -1,5 +1,6 @@
 package com.nhs.myownspace.global.util;
 
+import com.nhs.myownspace.auth.dto.LoginUser;
 import com.nhs.myownspace.user.Provider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -15,19 +16,14 @@ public class AuthUtil {
      * @return 정상일 경우 { provider, providerId } Map 반환
      *         실패 시 null 반환 → Controller에서 401 처리
      */
-    public static Map<String, String> getLoginUser() {
+    public static LoginUser getLoginUserOrNull() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (auth == null || auth.getPrincipal() == null) {
-            return null;
-        }
+        if (auth == null || auth.getPrincipal() == null) return null;
 
         Object principal = auth.getPrincipal();
 
         // anonymousUser 차단
-        if (principal instanceof String && principal.equals("anonymousUser")) {
-            return null;
-        }
+        if (principal instanceof String && principal.equals("anonymousUser")) return null;
 
         // principal이 우리가 저장한 Map인지 확인
         if (!(principal instanceof Map<?, ?> userAuth)) {
@@ -37,16 +33,12 @@ public class AuthUtil {
 
         String providerName = (String) userAuth.get("provider");
         String providerId = (String) userAuth.get("providerId");
-
         if (providerName == null || providerId == null) {
             log.warn("Principal 정보 부족");
             return null;
         }
-
-        return Map.of(
-                "provider", providerName,
-                "providerId", providerId
-        );
+        Provider provider = Provider.valueOf(providerName.toUpperCase());
+        return new LoginUser(provider, providerId);
     }
 
     /**
@@ -56,11 +48,11 @@ public class AuthUtil {
      * @param provider 작성자 소셜 로그인 제공 사이트
      */
     public static Boolean writerRightsCheck(String manipulation, String providerId, Provider provider){
-        var userInfo = getLoginUser();
+        LoginUser userInfo = AuthUtil.getLoginUserOrNull();
         if (userInfo == null) return false;
 
-        Provider reqProvider = Provider.valueOf(userInfo.get("provider").toUpperCase());
-        String reqProviderId = userInfo.get("providerId");
+        Provider reqProvider = userInfo.provider();
+        String reqProviderId = userInfo.providerId();
 
         if (!reqProviderId.equals(providerId) || !reqProvider.equals(provider)){
             if(manipulation.equals("update")){
@@ -76,5 +68,6 @@ public class AuthUtil {
 
         return  true;
     }
+
 
 }

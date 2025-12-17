@@ -1,21 +1,23 @@
 package com.nhs.myownspace.schedule.service;
 
+import com.nhs.myownspace.auth.dto.LoginUser;
 import com.nhs.myownspace.global.util.AuthUtil;
 import com.nhs.myownspace.schedule.entity.Schedule;
 import com.nhs.myownspace.schedule.dto.ScheduleRequestDto;
 import com.nhs.myownspace.schedule.dto.ScheduleResponseDto;
 import com.nhs.myownspace.schedule.dto.ScheduleMapper;
 import com.nhs.myownspace.schedule.repository.ScheduleRepository;
-import com.nhs.myownspace.user.Provider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
@@ -24,18 +26,14 @@ public class ScheduleService {
      *  내 일정 전체 조회
      */
     public List<ScheduleResponseDto> getMySchedules() {
-
-        var userInfo = AuthUtil.getLoginUser();
+        LoginUser userInfo = AuthUtil.getLoginUserOrNull();
         if (userInfo == null) {
             log.warn("인증되지 않은 사용자 요청 - 일정 조회");
             return null;
         }
 
-        Provider provider = Provider.valueOf(userInfo.get("provider").toUpperCase());
-        String providerId = userInfo.get("providerId");
-
         try {
-            List<Schedule> result = scheduleRepository.findByProviderAndProviderId(provider, providerId);
+            List<Schedule> result = scheduleRepository.findByProviderAndProviderId(userInfo.provider(), userInfo.providerId());
             return result.stream()
                     .map(ScheduleMapper::responseDto)
                     .toList();
@@ -48,18 +46,16 @@ public class ScheduleService {
     /**
      * 일정 생성
      */
+    @Transactional
     public ScheduleResponseDto  create(ScheduleRequestDto req) {
-        var userInfo = AuthUtil.getLoginUser();
+        LoginUser userInfo = AuthUtil.getLoginUserOrNull();
         if (userInfo == null) {
             log.warn("인증 정보 없음 - 일정 생성 실패");
             return null;
         }
 
-        Provider provider = Provider.valueOf(userInfo.get("provider").toUpperCase());
-        String providerId = userInfo.get("providerId");
-
         try {
-            Schedule schedule = ScheduleMapper.createEntity(req, provider, providerId);
+            Schedule schedule = ScheduleMapper.createEntity(req, userInfo.provider(), userInfo.providerId());
             Schedule saved = scheduleRepository.save(schedule);
             return ScheduleMapper.responseDto(saved);
         } catch (Exception e) {
@@ -71,20 +67,21 @@ public class ScheduleService {
     /**
      * 일정 수정
      */
+    @Transactional
     public ScheduleResponseDto  update(Long id, ScheduleRequestDto req) {
-        try {
+        LoginUser userInfo = AuthUtil.getLoginUserOrNull();
+        if (userInfo == null) {
+            log.warn("인증 정보 없음 - 일정 수정 실패");
+            return null;
+        }
 
-            Schedule schedule = scheduleRepository.findById(id).orElse(null);
+        try {
+            Schedule schedule = scheduleRepository
+                    .findByIdAndProviderAndProviderId(id, userInfo.provider(), userInfo.providerId())
+                    .orElse(null);
 
             if (schedule == null) {
-                log.warn("수정할 일정 없음 - id={}", id);
-                return null;
-            }
-
-            Boolean rightsCheck = AuthUtil.writerRightsCheck("update",schedule.getProviderId(), schedule.getProvider());
-
-            if (!rightsCheck){
-                log.warn("일정 수정 권한 없음 - id={}", id);
+                log.warn("수정 실패(없음/권한없음) - id={}", id);
                 return null;
             }
 
@@ -103,24 +100,26 @@ public class ScheduleService {
     /**
      * 일정 삭제
      */
+    @Transactional
     public boolean delete(Long id) {
-        try {
+        LoginUser userInfo = AuthUtil.getLoginUserOrNull();
+        if (userInfo == null) {
+            log.warn("인증 정보 없음 - 일정 삭제 실패");
+            return false;
+        }
 
-            Schedule schedule = scheduleRepository.findById(id).orElse(null);
+        try {
+            Schedule schedule = scheduleRepository
+                    .findByIdAndProviderAndProviderId(id, userInfo.provider(), userInfo.providerId())
+                    .orElse(null);
 
             if (schedule == null) {
-                log.warn("삭제할 일정 없음 - id={}", id);
+                log.warn("삭제 실패(없음/권한없음) - id={}", id);
                 return false;
             }
 
-            Boolean rightsCheck = AuthUtil.writerRightsCheck("delete",schedule.getProviderId(), schedule.getProvider());
+            scheduleRepository.delete(schedule);
 
-            if (!rightsCheck){
-                log.warn("일정 삭제 권한 없음 - id={}", id);
-                return false;
-            }
-
-            scheduleRepository.deleteById(id);
             return true;
 
         } catch (Exception e) {
