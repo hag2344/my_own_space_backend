@@ -36,7 +36,8 @@ public class SecurityConfig {
                         // 로그인, 카카오 인증 등 허용
                         .requestMatchers(
                                 "/api/auth/**",
-                                "/api/oauth/**"
+                                "/api/oauth/**",
+                                "/api/cron/**"
                         ).permitAll()
                         // 나머지는 인증 필요
                         .anyRequest().authenticated()

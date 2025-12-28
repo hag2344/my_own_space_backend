@@ -27,12 +27,15 @@ repositories {
 dependencies {
     // 웹 서버(Tomcat) + MVC
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     // JPA(Hibernate)로 DB 매핑/쿼리
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     // Spring Security
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    implementation 'org.jsoup:jsoup:1.17.2'
 
     // MySQL 연동용 드라이버 추가
     //runtimeOnly 'com.mysql:mysql-connector-j'
