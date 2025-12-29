@@ -3,7 +3,7 @@ package com.nhs.myownspace.mymemory.dto;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Getter
@@ -22,6 +22,6 @@ public class MyMemoryResponseDto {
     // 리스트용 썸네일 URL (첫 이미지 기준, 없으면 null)
     private String thumbnailUrl;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private OffsetDateTime createdAt;
+    private OffsetDateTime updatedAt;
 }
