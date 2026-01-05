@@ -1,6 +1,7 @@
 package com.nhs.myownspace.bookreport.service;
 
 import com.nhs.myownspace.auth.dto.LoginUser;
+import com.nhs.myownspace.global.storage.media.ThumbnailUrlResolver;
 import com.nhs.myownspace.global.storage.service.StorageService;
 import com.nhs.myownspace.global.storage.service.UploadManagerService;
 import com.nhs.myownspace.global.util.AuthUtil;
@@ -28,6 +29,7 @@ public class BookReportService {
     private final BookReportRepository bookReportRepository;
     private final StorageService storageService;
     private final UploadManagerService uploadManagerService;
+    private final ThumbnailUrlResolver thumbnailUrlResolver;
 
     /**
      *  독서 기록 조회
@@ -68,9 +70,7 @@ public class BookReportService {
 
             return result.map(b -> {
                 String path = b.getImagePath();
-                String thumbnailUrl = (path != null && !path.isBlank())
-                        ? storageService.createSignedUrl(path) // 매 조회마다 새 signed URL 발급
-                        : null;
+                String thumbnailUrl = thumbnailUrlResolver.resolveOrNull(path);
                 return  BookReportMapper.responseDto(b, thumbnailUrl);
             });
 
@@ -102,9 +102,7 @@ public class BookReportService {
 
             String path = bookReport.getImagePath();
 
-            String thumbnailUrl = (path != null && !path.isBlank())
-                    ? storageService.createSignedUrl(path)
-                    : null ;
+            String thumbnailUrl = thumbnailUrlResolver.resolveOrNull(path);
 
             return  BookReportMapper.responseDto(bookReport, thumbnailUrl);
 
