@@ -56,6 +56,13 @@ public class UploadManagerService {
         return new UploadResult(path, url);
     }
 
+    // 글 저장 시 사용 확정 (String path 일 경우 오버로딩)
+    public void markUsed(String refType, Long refId, String path) {
+        if (path == null || path.isBlank()) return;
+
+        markUsed(refType, refId, List.of(path));
+    }
+
     // 글 저장 시 사용 확정
     public void markUsed(String refType, Long refId, Collection<String> paths) {
         if (paths == null || paths.isEmpty()) return;
