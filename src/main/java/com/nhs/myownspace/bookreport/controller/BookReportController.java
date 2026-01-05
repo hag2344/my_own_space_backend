@@ -1,10 +1,10 @@
-package com.nhs.myownspace.mymemory.controller;
+package com.nhs.myownspace.bookreport.controller;
 
 import com.nhs.myownspace.global.dto.ApiResponse;
 import com.nhs.myownspace.global.dto.PagingResponse;
-import com.nhs.myownspace.mymemory.dto.MyMemoryRequestDto;
-import com.nhs.myownspace.mymemory.dto.MyMemoryResponseDto;
-import com.nhs.myownspace.mymemory.service.MyMemoryService;
+import com.nhs.myownspace.bookreport.dto.BookReportRequestDto;
+import com.nhs.myownspace.bookreport.dto.BookReportResponseDto;
+import com.nhs.myownspace.bookreport.service.BookReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -13,24 +13,24 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/mymemory")
+@RequestMapping("/api/bookreport")
 @RequiredArgsConstructor
-public class MyMemoryController {
+public class BookReportController {
 
-    private final MyMemoryService myMemoryService;
+    private final BookReportService bookReportService;
 
     /**
-     * 내 추억 조회 (내 추억)
+     * 독서 기록 조회 (내 독서 기록)
      */
     @GetMapping
-    public ResponseEntity<ApiResponse<PagingResponse<MyMemoryResponseDto>>> list(
+    public ResponseEntity<ApiResponse<PagingResponse<BookReportResponseDto>>> list(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(value = "q", required = false) String q
-    ) {
-        Page<MyMemoryResponseDto> res = myMemoryService.getMyMemories(page, size, q);
+    ){
+        Page<BookReportResponseDto> res = bookReportService.getBookReports(page, size, q);
 
-        if (res == null) {
+        if (res == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(ApiResponse.error("로그인이 필요합니다."));
         }
@@ -39,11 +39,11 @@ public class MyMemoryController {
     }
 
     /**
-     * id로 내 추억 조회 (내 추억)
+     * id로 독서 기록 조회 (내 독서 기록)
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<MyMemoryResponseDto>> detail(@PathVariable Long id) {
-        MyMemoryResponseDto dto = myMemoryService.getMyMemory(id);
+    public ResponseEntity<ApiResponse<BookReportResponseDto>> detail(@PathVariable Long id) {
+        BookReportResponseDto dto = bookReportService.getBookReport(id);
 
         if (dto == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -54,11 +54,11 @@ public class MyMemoryController {
     }
 
     /**
-     * 내 추억 생성
+     * 독서 기록 생성
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<MyMemoryResponseDto>> create(@RequestBody MyMemoryRequestDto req) {
-        MyMemoryResponseDto created = myMemoryService.create(req);
+    public ResponseEntity<ApiResponse<BookReportResponseDto>> create(@RequestBody BookReportRequestDto req) {
+        BookReportResponseDto created = bookReportService.create(req);
 
         if (created == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -69,14 +69,14 @@ public class MyMemoryController {
     }
 
     /**
-     * 내 추억 수정
+     * 독서 기록 수정
      */
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<MyMemoryResponseDto>> update(
+    public ResponseEntity<ApiResponse<BookReportResponseDto>> update(
             @PathVariable Long id,
-            @RequestBody MyMemoryRequestDto req
-    ) {
-        MyMemoryResponseDto updated = myMemoryService.update(id, req);
+            @RequestBody BookReportRequestDto req
+    ){
+        BookReportResponseDto updated = bookReportService.update(id, req);
 
         if (updated == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -87,11 +87,11 @@ public class MyMemoryController {
     }
 
     /**
-     * 내 추억 삭제
+     * 독서 기록 삭제
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
-        boolean ok = myMemoryService.delete(id);
+        boolean ok = bookReportService.delete(id);
 
         if (!ok) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
