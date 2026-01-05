@@ -26,7 +26,7 @@ public class DiaryController {
     @GetMapping
     public ResponseEntity<ApiResponse<PagingResponse<DiaryResponseDto>>> getDiaries(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String q
     ) {
         Page<DiaryResponseDto> diaries = diaryService.getMyDiaries(page, size, q);

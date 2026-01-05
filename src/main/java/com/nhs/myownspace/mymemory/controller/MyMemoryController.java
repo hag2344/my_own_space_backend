@@ -25,7 +25,7 @@ public class MyMemoryController {
     @GetMapping
     public ResponseEntity<ApiResponse<PagingResponse<MyMemoryResponseDto>>> list(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "10") int size,
             @RequestParam(value = "q", required = false) String q
     ) {
         Page<MyMemoryResponseDto> res = myMemoryService.getMyMemories(page, size, q);
