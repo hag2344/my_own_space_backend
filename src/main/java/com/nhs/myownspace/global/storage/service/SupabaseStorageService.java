@@ -161,4 +161,15 @@ public class SupabaseStorageService implements StorageService {
         if (idx < 0) return "";
         return filename.substring(idx).toLowerCase();
     }
+
+    public String safeSignedUrl(String path) {
+        if (path == null || path.isBlank()) return null;
+
+        try {
+            return createSignedUrl(path);
+        } catch (Exception e) {
+            log.warn("[Home] signed url skipped. path={}", path);
+            return null;
+        }
+    }
 }
