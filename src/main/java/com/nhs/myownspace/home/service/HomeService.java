@@ -1,5 +1,6 @@
 package com.nhs.myownspace.home.service;
 
+import com.nhs.myownspace.global.storage.media.ThumbnailUrlResolver;
 import com.nhs.myownspace.home.dto.*;
 import com.nhs.myownspace.auth.dto.LoginUser;
 import com.nhs.myownspace.global.util.AuthUtil;
@@ -37,6 +38,7 @@ public class HomeService {
     private final MyMemoryRepository myMemoryRepository;
     private final BookReportRepository bookReportRepository;
     private final StorageService storageService;
+    private final ThumbnailUrlResolver thumbnailUrlResolver;
 
     /**
      * 홈 화면 메뉴 요약 정보 조회
@@ -99,18 +101,13 @@ public class HomeService {
 
     private String extractMemoryThumbnail(MyMemory m) {
         List<String> paths = MyMemoryMapper.fromJson(m.getImagePathsJson());
-        return paths.stream()
-                .filter(p -> p != null && !p.isBlank())
-                .findFirst()
-                .map(storageService::createSignedUrl)
-                .orElse(null);
+        if (paths == null || paths.isEmpty()) return null;
+        return thumbnailUrlResolver.resolveFirstOrNull(paths);
     }
 
     private String extractBookThumbnail(BookReport b) {
         String path = b.getImagePath();
-        return (path != null && !path.isBlank())
-                ? storageService.createSignedUrl(path)
-                : null;
+        return thumbnailUrlResolver.resolveOrNull(path);
     }
 
 

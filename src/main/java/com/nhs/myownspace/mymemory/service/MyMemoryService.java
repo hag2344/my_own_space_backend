@@ -1,6 +1,7 @@
 package com.nhs.myownspace.mymemory.service;
 
 import com.nhs.myownspace.auth.dto.LoginUser;
+import com.nhs.myownspace.global.storage.media.ThumbnailUrlResolver;
 import com.nhs.myownspace.global.storage.service.StorageService;
 import com.nhs.myownspace.global.storage.service.UploadManagerService;
 import com.nhs.myownspace.global.storage.html.SupabaseImageHtmlRewriter;
@@ -30,6 +31,7 @@ public class MyMemoryService {
     private final StorageService storageService;      // 썸네일용 signed URL
     private final UploadManagerService uploadManagerService; // 이미지 메타/정리
     private final SupabaseImageHtmlRewriter supabaseImageHtmlRewriter;
+    private final ThumbnailUrlResolver thumbnailUrlResolver;
 
     /**
      *  내 추억 조회
@@ -76,11 +78,7 @@ public class MyMemoryService {
                 List<String> paths = MyMemoryMapper.fromJson(m.getImagePathsJson());
 
                 // 첫 이미지 기준 썸네일 URL
-                String thumbnailUrl = paths.stream()
-                        .filter(p -> p != null && !p.isBlank())
-                        .findFirst()
-                        .map(storageService::createSignedUrl) // 매 조회마다 새 signed URL 발급
-                        .orElse(null);
+                String thumbnailUrl = thumbnailUrlResolver.resolveFirstOrNull(paths);
 
                 return MyMemoryMapper.responseDto(m, paths, thumbnailUrl);
             });
@@ -116,11 +114,7 @@ public class MyMemoryService {
             List<String> paths = MyMemoryMapper.fromJson(myMemory.getImagePathsJson());
 
             // 썸네일용(리스트에서 쓰는 것과 동일)
-            String thumbnailUrl = paths.stream()
-                    .filter(p -> p != null && !p.isBlank())
-                    .findFirst()
-                    .map(storageService::createSignedUrl) // 상세에서도 썸네일용 fresh URL
-                    .orElse(null);
+            String thumbnailUrl = thumbnailUrlResolver.resolveFirstOrNull(paths);
 
             // HTML 안의 img src를 모두 fresh signed URL로 갈아끼움
             String originalHtml = myMemory.getContentHtml();
