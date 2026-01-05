@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 public interface DiaryRepository extends JpaRepository<Diary, Long> {
@@ -16,4 +17,6 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
     );
 
     Optional<Diary> findByIdAndProviderAndProviderId(Long id, Provider provider, String providerId);
+
+    Optional<Diary> findTopByProviderAndProviderIdAndTodayDateOrderByCreatedAtDesc(Provider provider, String providerId, LocalDate todayDate);
 }
