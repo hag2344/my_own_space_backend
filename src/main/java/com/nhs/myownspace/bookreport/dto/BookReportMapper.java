@@ -1,7 +1,7 @@
 package com.nhs.myownspace.bookreport.dto;
 
 import com.nhs.myownspace.bookreport.entity.BookReport;
-import com.nhs.myownspace.user.Provider;
+import com.nhs.myownspace.user.entity.User;
 
 public class BookReportMapper {
 
@@ -28,12 +28,15 @@ public class BookReportMapper {
     /**
      * Request DTO → Entity (생성 시)
      */
-    public static BookReport createEntity(BookReportRequestDto req, Provider provider, String providerId){
+    public static BookReport createEntity(BookReportRequestDto req, Long userId){
         if(req == null) return  null;
 
+        User userRef = User.builder()
+                .id(userId)
+                .build();
+
         return BookReport.builder()
-                .provider(provider)
-                .providerId(providerId)
+                .user(userRef)
                 .bookName(req.getBookName())
                 .publisher(req.getPublisher())
                 .author(req.getAuthor())

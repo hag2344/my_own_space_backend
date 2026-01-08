@@ -2,7 +2,6 @@ package com.nhs.myownspace.user.service;
 
 import com.nhs.myownspace.auth.dto.LoginUser;
 import com.nhs.myownspace.global.util.AuthUtil;
-import com.nhs.myownspace.user.Provider;
 import com.nhs.myownspace.user.dto.UserMapper;
 import com.nhs.myownspace.user.entity.User;
 import com.nhs.myownspace.user.repository.UserRepository;
@@ -30,15 +29,15 @@ public class UserService {
             return null;
         }
 
-        User user = userRepository.findByProviderAndProviderId(userInfo.provider(), userInfo.providerId())
+        User user = userRepository.findById(userInfo.userId())
                 .orElse(null);
 
         if (user == null) {
-            log.warn("DB에서 사용자 정보 없음 - provider: {}, providerId: {}", userInfo.provider(), userInfo.providerId());
+            log.warn("DB에서 사용자 정보 없음 - userId: {}", userInfo.userId());
             return null;
         }
 
-        log.info("사용자 정보 조회 성공 - providerId: {}", userInfo.providerId());
+        log.info("사용자 정보 조회 성공 - userId: {}", userInfo.userId());
 
         return UserMapper.responseDto(user);
     }

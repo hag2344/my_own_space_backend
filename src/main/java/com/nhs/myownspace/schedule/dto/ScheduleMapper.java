@@ -2,7 +2,7 @@ package com.nhs.myownspace.schedule.dto;
 
 import com.nhs.myownspace.global.util.DateFormatUtil;
 import com.nhs.myownspace.schedule.entity.Schedule;
-import com.nhs.myownspace.user.Provider;
+import com.nhs.myownspace.user.entity.User;
 
 public class ScheduleMapper {
 
@@ -29,12 +29,15 @@ public class ScheduleMapper {
     /**
      * Request DTO → Entity (생성 시)
      */
-    public static Schedule createEntity(ScheduleRequestDto req, Provider provider, String providerId) {
+    public static Schedule createEntity(ScheduleRequestDto req, Long userId) {
         if (req == null) return null;
 
+        User userRef = User.builder()
+                .id(userId)
+                .build();
+
         return Schedule.builder()
-                .provider(provider)
-                .providerId(providerId)
+                .user(userRef)
                 .title(req.getTitle())
                 .startDate(DateFormatUtil.toDateTime(req.getStartDate(), req.isAllDay(), false))
                 .endDate(DateFormatUtil.toDateTime(req.getEndDate(), req.isAllDay(), true))

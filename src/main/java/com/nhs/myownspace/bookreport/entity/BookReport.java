@@ -1,6 +1,6 @@
 package com.nhs.myownspace.bookreport.entity;
 
-import com.nhs.myownspace.user.Provider;
+import com.nhs.myownspace.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -10,19 +10,19 @@ import java.time.OffsetDateTime;
 @Entity
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor @Builder
-@Table(name = "book_report")
+@Table(name = "book_report",
+        indexes = {
+                @Index(name = "idx_book_report_user_id", columnList = "user_id")
+        })
 public class BookReport {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private Provider provider;
-
-    @Column(name = "provider_id", nullable = false, length = 100)
-    private String providerId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(name = "book_name", nullable = false, length = 100)
     private String bookName;

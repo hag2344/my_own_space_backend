@@ -12,7 +12,6 @@ public class UserMapper {
         return UserResponseDto.builder()
                 .nickname(user.getNickname())
                 .profileImage(user.getProfileImage())
-                .provider(user.getProvider().name())
                 .build();
     }
 }

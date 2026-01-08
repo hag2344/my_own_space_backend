@@ -2,7 +2,7 @@ package com.nhs.myownspace.diary.dto;
 
 import com.nhs.myownspace.global.util.DateFormatUtil;
 import com.nhs.myownspace.diary.entity.Diary;
-import com.nhs.myownspace.user.Provider;
+import com.nhs.myownspace.user.entity.User;
 
 public class DiaryMapper {
 
@@ -32,12 +32,15 @@ public class DiaryMapper {
     /**
      * Request DTO → Entity (생성 시)
      */
-    public static Diary createEntity(DiaryRequestDto req, Provider provider, String providerId) {
+    public static Diary createEntity(DiaryRequestDto req, Long userId) {
         if (req == null) return null;
 
+        User userRef = User.builder()
+                .id(userId)
+                .build();
+
         return Diary.builder()
-                .provider(provider)
-                .providerId(providerId)
+                .user(userRef)
                 .title(req.getTitle())
                 .todayDate(DateFormatUtil.toDate(req.getTodayDate()))
                 .weatherId(req.getWeatherId())

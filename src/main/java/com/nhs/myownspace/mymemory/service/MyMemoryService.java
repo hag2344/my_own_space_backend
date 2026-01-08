@@ -2,7 +2,6 @@ package com.nhs.myownspace.mymemory.service;
 
 import com.nhs.myownspace.auth.dto.LoginUser;
 import com.nhs.myownspace.global.storage.media.ThumbnailUrlResolver;
-import com.nhs.myownspace.global.storage.service.StorageService;
 import com.nhs.myownspace.global.storage.service.UploadManagerService;
 import com.nhs.myownspace.global.storage.html.SupabaseImageHtmlRewriter;
 import com.nhs.myownspace.global.util.AuthUtil;
@@ -28,7 +27,6 @@ public class MyMemoryService {
     private static final String REF_TYPE = "MYMEMORY";
 
     private final MyMemoryRepository myMemoryRepository;
-    private final StorageService storageService;      // 썸네일용 signed URL
     private final UploadManagerService uploadManagerService; // 이미지 메타/정리
     private final SupabaseImageHtmlRewriter supabaseImageHtmlRewriter;
     private final ThumbnailUrlResolver thumbnailUrlResolver;
@@ -58,16 +56,14 @@ public class MyMemoryService {
             Page<MyMemory> result;
             if (keyword.isEmpty()) {
                 // 검색어 없으면 기존처럼 전체 조회
-                result = myMemoryRepository.findByProviderAndProviderId(
-                        userInfo.provider(),
-                        userInfo.providerId(),
+                result = myMemoryRepository.findByUser_Id(
+                        userInfo.userId(),
                         pageable
                 );
             } else {
                 // 검색어 있으면 제목/내용 검색
-                result = myMemoryRepository.searchByProviderAndProviderIdAndKeyword(
-                        userInfo.provider(),
-                        userInfo.providerId(),
+                result = myMemoryRepository.searchByUser_IdAndKeyword(
+                        userInfo.userId(),
                         keyword,
                         pageable
                 );
@@ -101,8 +97,8 @@ public class MyMemoryService {
         }
 
         try {
-            MyMemory myMemory = myMemoryRepository.findByIdAndProviderAndProviderId(
-                            id, userInfo.provider(), userInfo.providerId())
+            MyMemory myMemory = myMemoryRepository.findByIdAndUser_Id(
+                            id, userInfo.userId())
                     .orElse(null);
 
             if (myMemory == null) {
@@ -141,7 +137,7 @@ public class MyMemoryService {
         }
 
         try {
-            MyMemory myMemory = MyMemoryMapper.createEntity(req, userInfo.provider(), userInfo.providerId());
+            MyMemory myMemory = MyMemoryMapper.createEntity(req, userInfo.userId());
             MyMemory saved = myMemoryRepository.save(myMemory);
             log.info("내 추억 생성 완료 id={}", saved.getId());
 
@@ -167,8 +163,8 @@ public class MyMemoryService {
         }
 
         try {
-            MyMemory myMemory = myMemoryRepository.findByIdAndProviderAndProviderId(
-                            id, userInfo.provider(), userInfo.providerId())
+            MyMemory myMemory = myMemoryRepository.findByIdAndUser_Id(
+                            id, userInfo.userId())
                     .orElse(null);
 
             if (myMemory == null) {
@@ -210,8 +206,8 @@ public class MyMemoryService {
         }
 
         try {
-            MyMemory myMemory = myMemoryRepository.findByIdAndProviderAndProviderId(
-                            id, userInfo.provider(), userInfo.providerId())
+            MyMemory myMemory = myMemoryRepository.findByIdAndUser_Id(
+                            id, userInfo.userId())
                     .orElse(null);
 
             if (myMemory == null) {

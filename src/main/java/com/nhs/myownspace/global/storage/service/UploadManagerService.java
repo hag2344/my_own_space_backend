@@ -4,11 +4,12 @@ import com.nhs.myownspace.global.storage.model.UploadFolder;
 import com.nhs.myownspace.global.storage.model.UploadedFile;
 import com.nhs.myownspace.global.storage.repository.UploadedFileRepository;
 import com.nhs.myownspace.global.util.AuthUtil;
-import com.nhs.myownspace.user.Provider;
+import com.nhs.myownspace.user.entity.User;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
@@ -17,6 +18,7 @@ import java.util.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UploadManagerService {
 
     private final SupabaseStorageService storageService;
@@ -29,25 +31,28 @@ public class UploadManagerService {
         if (user == null) {
             throw new RuntimeException("로그인이 필요합니다.");
         }
-        return new ProviderContext(user.provider(), user.providerId());
+        return new ProviderContext(user.userId());
     }
 
     @Data
     public static class ProviderContext {
-        private final Provider provider;
-        private final String providerId;
+        private final Long userId;
     }
 
     // 임시 업로드
+    @Transactional
     public UploadResult uploadTemp(MultipartFile file, UploadFolder folder) throws Exception {
         var user = getUser();
 
         String path = storageService.uploadPrivate(folder, file);
         String url = storageService.createSignedUrl(path);
 
+        User userRef = User.builder()
+                .id(user.getUserId())
+                .build();
+
         UploadedFile meta = UploadedFile.builder()
-                .provider(user.getProvider())
-                .providerId(user.getProviderId())
+                .user(userRef)
                 .path(path)
                 .used(false)
                 .build();
@@ -64,15 +69,15 @@ public class UploadManagerService {
     }
 
     // 글 저장 시 사용 확정
+    @Transactional
     public void markUsed(String refType, Long refId, Collection<String> paths) {
         if (paths == null || paths.isEmpty()) return;
 
         var user = getUser();
 
         List<UploadedFile> files =
-                uploadedFileRepository.findByProviderAndProviderIdAndPathIn(
-                        user.getProvider(),
-                        user.getProviderId(),
+                uploadedFileRepository.findByUser_IdAndPathIn(
+                        user.getUserId(),
                         paths
                 );
 
@@ -88,6 +93,7 @@ public class UploadManagerService {
     }
 
     // 수정 시 빠진 이미지 삭제
+    @Transactional
     public void deleteRemovedOnUpdate(
             String refType,
             Long refId,
@@ -103,9 +109,8 @@ public class UploadManagerService {
         var user = getUser();
 
         List<UploadedFile> files =
-                uploadedFileRepository.findByProviderAndProviderIdAndPathIn(
-                        user.getProvider(),
-                        user.getProviderId(),
+                uploadedFileRepository.findByUser_IdAndPathIn(
+                        user.getUserId(),
                         removed
                 );
 
@@ -131,15 +136,15 @@ public class UploadManagerService {
     }
 
     // 글 삭제 시 이미지 전체 삭제
+    @Transactional
     public void deleteByRef(String refType, Long refId) {
         var user = getUser();
 
         List<UploadedFile> files =
-                uploadedFileRepository.findByRefTypeAndRefIdAndProviderAndProviderId(
+                uploadedFileRepository.findByRefTypeAndRefIdAndUser_Id(
                         refType,
                         refId,
-                        user.getProvider(),
-                        user.getProviderId()
+                        user.getUserId()
                 );
 
         files.forEach(this::deletePhysicalAndMeta);
