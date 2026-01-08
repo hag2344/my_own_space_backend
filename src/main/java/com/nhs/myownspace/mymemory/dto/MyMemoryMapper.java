@@ -3,7 +3,7 @@ package com.nhs.myownspace.mymemory.dto;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhs.myownspace.mymemory.entity.MyMemory;
-import com.nhs.myownspace.user.Provider;
+import com.nhs.myownspace.user.entity.User;
 
 import java.util.Collections;
 import java.util.List;
@@ -68,12 +68,15 @@ public class MyMemoryMapper {
     /**
      * Request DTO → Entity (생성 시)
      */
-    public static MyMemory createEntity(MyMemoryRequestDto req, Provider provider, String providerId) {
+    public static MyMemory createEntity(MyMemoryRequestDto req, Long userId) {
         if (req == null) return null;
 
+        User userRef = User.builder()
+                .id(userId)
+                .build();
+
         return MyMemory.builder()
-                .provider(provider)
-                .providerId(providerId)
+                .user(userRef)
                 .title(req.getTitle())
                 .contentHtml(req.getContentHtml())
                 .imagePathsJson(toJson(req.getImagePaths()))

@@ -21,14 +21,12 @@ public class JwtService {
 
     /**
      * Access Token (1시간 유효)
-     * @param provider  각 소셜 로그인 제공 사이트
-     * @param providerId 각 provider 내에서 사용자 고유 ID
+     * @param userId  사용자 ID
      */
-    public String createAccessToken(String provider, String providerId){
+    public String createAccessToken(String userId){
         try{
             Claims claims = Jwts.claims();
-            claims.setSubject(providerId);
-            claims.put("provider", provider);
+            claims.setSubject(userId);
 
             String token = Jwts.builder()
                     .setClaims(claims)
@@ -37,7 +35,7 @@ public class JwtService {
                     .signWith(key, SignatureAlgorithm.HS256)
                     .compact();
 
-            log.debug("Access Token 생성 완료 (provider: {}, providerId: {})",provider ,providerId);
+            log.debug("Access Token 생성 완료 (userId: {})",userId);
             return token;
         }catch (Exception e){
             log.error("Access Token 생성 실패: {}", e.getMessage(), e);
@@ -47,14 +45,12 @@ public class JwtService {
 
     /**
      * Refresh Token (2주 유효)
-     * @param provider  각 소셜 로그인 제공 사이트
-     * @param providerId 각 provider 내에서 사용자 고유 ID
+     * @param userId  사용자 ID
      */
-    public String createRefreshToken(String provider, String providerId){
+    public String createRefreshToken(String userId){
         try {
             Claims claims = Jwts.claims();
-            claims.setSubject(providerId);
-            claims.put("provider", provider);
+            claims.setSubject(userId);
 
             String token = Jwts.builder()
                     .setClaims(claims)
@@ -62,7 +58,7 @@ public class JwtService {
                     .setExpiration(new Date(System.currentTimeMillis()+1000L*60*60*24*14)) // 14일
                     .signWith(key, SignatureAlgorithm.HS256)
                     .compact();
-            log.debug("Refresh Token 생성 완료 (provider: {}, providerId: {})", provider, providerId);
+            log.debug("Refresh Token 생성 완료 (userId: {})", userId);
             return token;
         }catch (Exception e){
             log.error("Refresh Token 생성 실패: {}", e.getMessage(), e);
@@ -118,7 +114,7 @@ public class JwtService {
                     .build()
                     .parseClaimsJws(token)
                     .getBody()
-                    .getSubject(); // Subject에 Provider 사용자 ID 저장됨
+                    .getSubject(); // Subject에 사용자 ID 저장됨
 
             log.debug("JWT에서 사용자 ID 추출 완료: {}", userId);
             return userId;
@@ -132,28 +128,4 @@ public class JwtService {
         return null;
     }
 
-    /**
-     * JWT에서 provider 같은 claim 값 추출
-     * @param token JWT 문자열
-     * @return JWT Claim (provider)
-     */
-    public String extractClaim(String token, String keyName) {
-        try {
-            if (token == null || token.isEmpty()) {
-                log.warn("토큰이 비어 있어 claims 추출 불가");
-                return null;
-            }
-
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-
-            return (String) claims.get(keyName);
-        } catch (Exception e) {
-            log.warn("JWT claim 추출 실패: {}", e.getMessage());
-            return null;
-        }
-    }
 }

@@ -2,7 +2,6 @@ package com.nhs.myownspace.mymemory.repository;
 
 
 import com.nhs.myownspace.mymemory.entity.MyMemory;
-import com.nhs.myownspace.user.Provider;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,35 +12,31 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MyMemoryRepository extends JpaRepository<MyMemory, Long> {
-    Page<MyMemory> findByProviderAndProviderId(
-            Provider provider,
-            String providerId,
+    Page<MyMemory> findByUser_Id(
+            Long userId,
             Pageable pageable
     );
 
-    Optional<MyMemory> findByIdAndProviderAndProviderId(
+    Optional<MyMemory> findByIdAndUser_Id(
             Long id,
-            Provider provider,
-            String providerId
+            Long userId
     );
 
     // 제목/내용에 keyword 포함 검색
     @Query("""
         select m
         from MyMemory m
-        where m.provider = :provider
-          and m.providerId = :providerId
+        where m.user.Id = :userId
           and (
             lower(m.title) like lower(concat('%', :keyword, '%'))
             or lower(m.contentHtml) like lower(concat('%', :keyword, '%'))
           )
         """)
-    Page<MyMemory> searchByProviderAndProviderIdAndKeyword(
-            @Param("provider") Provider provider,
-            @Param("providerId") String providerId,
+    Page<MyMemory> searchByUser_IdAndKeyword(
+            @Param("userId") Long userId,
             @Param("keyword") String keyword,
             Pageable pageable
     );
 
-    List<MyMemory> findTop3ByProviderAndProviderIdOrderByCreatedAtDesc(Provider provider, String providerId);
+    List<MyMemory> findTop3ByUser_IdOrderByCreatedAtDesc(Long userId);
 }

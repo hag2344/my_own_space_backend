@@ -1,6 +1,6 @@
 package com.nhs.myownspace.global.storage.model;
 
-import com.nhs.myownspace.user.Provider;
+import com.nhs.myownspace.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -13,19 +13,19 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "uploaded_file")
+@Table(name = "uploaded_file",
+        indexes = {
+                @Index(name = "idx_uploaded_file_user_id", columnList = "user_id")
+        })
 public class UploadedFile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private Provider provider;
-
-    @Column(name = "provider_id", nullable = false, length = 100)
-    private String providerId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false)
     private String path;
