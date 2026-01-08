@@ -1,6 +1,6 @@
 package com.nhs.myownspace.mymemory.entity;
 
-import com.nhs.myownspace.user.Provider;
+import com.nhs.myownspace.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -8,21 +8,21 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.OffsetDateTime;
 
 @Entity
+@Table(name = "my_memory",
+        indexes = {
+                @Index(name = "idx_my_memory_user_id", columnList = "user_id")
+        })
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor @Builder
-@Table(name = "my_memory")
 public class MyMemory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private Provider provider;
-
-    @Column(name = "provider_id", nullable = false, length = 100)
-    private String providerId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false, length = 100)
     private String title;

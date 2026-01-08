@@ -1,6 +1,6 @@
 package com.nhs.myownspace.schedule.entity;
 
-import com.nhs.myownspace.user.Provider;
+import com.nhs.myownspace.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -11,21 +11,19 @@ import java.time.LocalDateTime;
 @Entity
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor @Builder
-@Table(name = "schedule")
+@Table(name = "schedule",
+        indexes = {
+                @Index(name = "idx_schedule_user_id", columnList = "user_id")
+        })
 public class Schedule {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 소셜 로그인 제공자
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private Provider provider;
-
-    // 제공자별 유저 식별자 (카카오 id 등)
-    @Column(name = "provider_id", nullable = false, length = 100)
-    private String providerId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     // 일정 제목
     @Column(nullable = false, length = 100)

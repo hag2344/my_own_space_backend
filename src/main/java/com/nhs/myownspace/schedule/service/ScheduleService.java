@@ -33,7 +33,7 @@ public class ScheduleService {
         }
 
         try {
-            List<Schedule> result = scheduleRepository.findByProviderAndProviderId(userInfo.provider(), userInfo.providerId());
+            List<Schedule> result = scheduleRepository.findByUser_Id(userInfo.userId());
             return result.stream()
                     .map(ScheduleMapper::responseDto)
                     .toList();
@@ -47,7 +47,7 @@ public class ScheduleService {
      * 일정 생성
      */
     @Transactional
-    public ScheduleResponseDto  create(ScheduleRequestDto req) {
+    public ScheduleResponseDto create(ScheduleRequestDto req) {
         LoginUser userInfo = AuthUtil.getLoginUserOrNull();
         if (userInfo == null) {
             log.warn("인증 정보 없음 - 일정 생성 실패");
@@ -55,7 +55,7 @@ public class ScheduleService {
         }
 
         try {
-            Schedule schedule = ScheduleMapper.createEntity(req, userInfo.provider(), userInfo.providerId());
+            Schedule schedule = ScheduleMapper.createEntity(req, userInfo.userId());
             Schedule saved = scheduleRepository.save(schedule);
             return ScheduleMapper.responseDto(saved);
         } catch (Exception e) {
@@ -77,7 +77,7 @@ public class ScheduleService {
 
         try {
             Schedule schedule = scheduleRepository
-                    .findByIdAndProviderAndProviderId(id, userInfo.provider(), userInfo.providerId())
+                    .findByIdAndUser_Id(id, userInfo.userId())
                     .orElse(null);
 
             if (schedule == null) {
@@ -110,7 +110,7 @@ public class ScheduleService {
 
         try {
             Schedule schedule = scheduleRepository
-                    .findByIdAndProviderAndProviderId(id, userInfo.provider(), userInfo.providerId())
+                    .findByIdAndUser_Id(id, userInfo.userId())
                     .orElse(null);
 
             if (schedule == null) {

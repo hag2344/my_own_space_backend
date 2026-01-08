@@ -1,7 +1,6 @@
 package com.nhs.myownspace.global.storage.repository;
 
 import com.nhs.myownspace.global.storage.model.UploadedFile;
-import com.nhs.myownspace.user.Provider;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
@@ -11,9 +10,8 @@ import java.util.List;
 public interface UploadedFileRepository extends JpaRepository<UploadedFile, Long> {
 
     // 특정 사용자가 올린 파일들 중, path 목록에 포함되는 것들
-    List<UploadedFile> findByProviderAndProviderIdAndPathIn(
-            Provider provider,
-            String providerId,
+    List<UploadedFile> findByUser_IdAndPathIn(
+            Long userId,
             Collection<String> paths
     );
 
@@ -21,10 +19,9 @@ public interface UploadedFileRepository extends JpaRepository<UploadedFile, Long
     List<UploadedFile> findByUsedFalseAndCreatedAtBefore(LocalDateTime cutoff);
 
     // 특정 글(refType/refId)에 묶인 이미지들 찾기 (삭제 시 등)
-    List<UploadedFile> findByRefTypeAndRefIdAndProviderAndProviderId(
+    List<UploadedFile> findByRefTypeAndRefIdAndUser_Id(
             String refType,
             Long refId,
-            Provider provider,
-            String providerId
+            Long userId
     );
 }

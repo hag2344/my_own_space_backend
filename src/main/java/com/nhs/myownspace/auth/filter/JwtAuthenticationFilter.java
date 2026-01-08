@@ -40,15 +40,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 
             // JWT 유효성 검증 및 사용자 식별
             if(jwt!=null && jwtService.validateJwt(jwt)){
-                String providerId = jwtService.extractUserId(jwt);
-                String provider = jwtService.extractClaim(jwt, "provider");
+                String userId = jwtService.extractUserId(jwt);
 
-                if (providerId != null && provider != null){
+                if (userId != null){
 
                     // principal을 Map 형태로 구성
                     var principal = Map.of(
-                            "provider", provider,
-                            "providerId", providerId
+                            "userId", Long.valueOf(userId)
                     );
 
                     // 권한은 빈 리스트라도 넣는 게 안전
@@ -62,9 +60,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 
                     // SecurityContext에 저장
                     SecurityContextHolder.getContext().setAuthentication(auth);
-                    log.debug("JWT 인증 성공: provider: {}, providerId: {}", provider, providerId);
+                    log.debug("JWT 인증 성공: userId: {}", userId);
                 }else{
-                    log.warn("JWT claim 누락 - provider or providerId == null");
+                    log.warn("JWT claim 누락 - userId == null");
                 }
             }
 

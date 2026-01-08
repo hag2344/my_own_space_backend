@@ -2,7 +2,6 @@ package com.nhs.myownspace.bookreport.service;
 
 import com.nhs.myownspace.auth.dto.LoginUser;
 import com.nhs.myownspace.global.storage.media.ThumbnailUrlResolver;
-import com.nhs.myownspace.global.storage.service.StorageService;
 import com.nhs.myownspace.global.storage.service.UploadManagerService;
 import com.nhs.myownspace.global.util.AuthUtil;
 import com.nhs.myownspace.bookreport.dto.BookReportMapper;
@@ -27,7 +26,6 @@ public class BookReportService {
     private static final String REF_TYPE = "BOOKREPORT";
 
     private final BookReportRepository bookReportRepository;
-    private final StorageService storageService;
     private final UploadManagerService uploadManagerService;
     private final ThumbnailUrlResolver thumbnailUrlResolver;
 
@@ -54,15 +52,13 @@ public class BookReportService {
 
             Page<BookReport> result;
             if (keyword.isEmpty()){
-                result = bookReportRepository.findByProviderAndProviderId(
-                        userInfo.provider(),
-                        userInfo.providerId(),
+                result = bookReportRepository.findByUser_Id(
+                        userInfo.userId(),
                         pageable
                 );
             }else{
-                result = bookReportRepository.findByProviderAndProviderIdAndBookNameContainingIgnoreCase(
-                        userInfo.provider(),
-                        userInfo.providerId(),
+                result = bookReportRepository.findByUser_IdAndBookNameContainingIgnoreCase(
+                        userInfo.userId(),
                         keyword,
                         pageable
                 );
@@ -91,8 +87,8 @@ public class BookReportService {
         }
 
         try {
-            BookReport bookReport = bookReportRepository.findByIdAndProviderAndProviderId(
-                            id, userInfo.provider(), userInfo.providerId())
+            BookReport bookReport = bookReportRepository.findByIdAndUser_Id(
+                            id, userInfo.userId())
                     .orElse(null);
 
             if (bookReport == null) {
@@ -124,7 +120,7 @@ public class BookReportService {
         }
 
         try{
-            BookReport bookReport = BookReportMapper.createEntity(req, userInfo.provider(), userInfo.providerId());
+            BookReport bookReport = BookReportMapper.createEntity(req, userInfo.userId());
             BookReport saved = bookReportRepository.save(bookReport);
             log.info("독서 기록 생성 완료 id={}", saved.getId());
 
@@ -150,8 +146,8 @@ public class BookReportService {
         }
 
         try{
-            BookReport bookReport = bookReportRepository.findByIdAndProviderAndProviderId(
-                            id, userInfo.provider(), userInfo.providerId())
+            BookReport bookReport = bookReportRepository.findByIdAndUser_Id(
+                            id, userInfo.userId())
                     .orElse(null);
 
             if(bookReport == null){
@@ -195,8 +191,8 @@ public class BookReportService {
         }
 
         try{
-            BookReport bookReport = bookReportRepository.findByIdAndProviderAndProviderId(
-                            id, userInfo.provider(), userInfo.providerId())
+            BookReport bookReport = bookReportRepository.findByIdAndUser_Id(
+                            id, userInfo.userId())
                     .orElse(null);
 
             if(bookReport == null){

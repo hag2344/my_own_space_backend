@@ -5,7 +5,6 @@ import com.nhs.myownspace.home.dto.*;
 import com.nhs.myownspace.auth.dto.LoginUser;
 import com.nhs.myownspace.global.util.AuthUtil;
 import com.nhs.myownspace.mymemory.dto.MyMemoryMapper;
-import com.nhs.myownspace.user.Provider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -20,7 +19,6 @@ import com.nhs.myownspace.mymemory.repository.MyMemoryRepository;
 import com.nhs.myownspace.schedule.entity.Schedule;
 import com.nhs.myownspace.schedule.repository.ScheduleRepository;
 import com.nhs.myownspace.home.dto.HomeMapper;
-import com.nhs.myownspace.global.storage.service.StorageService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -37,7 +35,6 @@ public class HomeService {
     private final DiaryRepository diaryRepository;
     private final MyMemoryRepository myMemoryRepository;
     private final BookReportRepository bookReportRepository;
-    private final StorageService storageService;
     private final ThumbnailUrlResolver thumbnailUrlResolver;
 
     /**
@@ -57,20 +54,19 @@ public class HomeService {
 
         try {
 
-            Provider provider = userInfo.provider();
-            String providerId = userInfo.providerId();
+            Long userId = userInfo.userId();
 
             // 1) 오늘 일정: start <= today <= end
-            int todayCount = scheduleRepository.countOverlappingDay(provider,providerId,startOfDay, endOfDay);
-            List<Schedule> todayTop3 = scheduleRepository.findTodayTop3(provider,providerId,startOfDay, endOfDay, PageRequest.of(0, 3));
-            // 2) 오늘 일기(있으면 1개) - 너 구조에 맞춰 메서드명 조정
-            Diary todayDiary = diaryRepository.findTopByProviderAndProviderIdAndTodayDateOrderByCreatedAtDesc(provider, providerId,today).orElse(null);
+            int todayCount = scheduleRepository.countOverlappingDay(userId,startOfDay, endOfDay);
+            List<Schedule> todayTop3 = scheduleRepository.findTodayTop3(userId,startOfDay, endOfDay, PageRequest.of(0, 3));
+            // 2) 오늘 일기(있으면 1개)
+            Diary todayDiary = diaryRepository.findTopByUser_IdAndTodayDateOrderByCreatedAtDesc(userId,today).orElse(null);
 
             // 3) 최신 내추억 3개
-            List<MyMemory> memories = myMemoryRepository.findTop3ByProviderAndProviderIdOrderByCreatedAtDesc(provider, providerId);
+            List<MyMemory> memories = myMemoryRepository.findTop3ByUser_IdOrderByCreatedAtDesc(userId);
 
             // 4) 최신 독서기록 3개
-            List<BookReport> books = bookReportRepository.findTop3ByProviderAndProviderIdOrderByCreatedAtDesc(provider, providerId);
+            List<BookReport> books = bookReportRepository.findTop3ByUser_IdOrderByCreatedAtDesc(userId);
 
             return HomeSummaryResponseDto.builder()
                     .todayScheduleCount(todayCount)

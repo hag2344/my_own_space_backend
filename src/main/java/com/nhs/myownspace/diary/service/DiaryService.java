@@ -50,10 +50,10 @@ public class DiaryService {
 
             Page<Diary> result;
             if(keyword.isEmpty()){
-                result = diaryRepository.findByProviderAndProviderId(userInfo.provider(), userInfo.providerId(), pageable);
+                result = diaryRepository.findByUser_Id(userInfo.userId(), pageable);
             }else {
-                result = diaryRepository.findByProviderAndProviderIdAndTitleContainingIgnoreCase(
-                        userInfo.provider(), userInfo.providerId(), keyword, pageable
+                result = diaryRepository.findByUser_IdAndTitleContainingIgnoreCase(
+                        userInfo.userId(), keyword, pageable
                 );
             }
 
@@ -75,7 +75,7 @@ public class DiaryService {
                 return null;
             }
 
-            Diary diary = diaryRepository.findByIdAndProviderAndProviderId(id,userInfo.provider(),userInfo.providerId()).orElse(null);
+            Diary diary = diaryRepository.findByIdAndUser_Id(id,userInfo.userId()).orElse(null);
             if (diary == null) {
                 log.warn("조회할 일기 없음 - id={}", id);
                 return null; // 없음
@@ -101,7 +101,7 @@ public class DiaryService {
         }
 
         try {
-            Diary diary = DiaryMapper.createEntity(req, userInfo.provider(), userInfo.providerId());
+            Diary diary = DiaryMapper.createEntity(req, userInfo.userId());
             Diary saved = diaryRepository.save(diary);
             return DiaryMapper.responseDto(saved);
         } catch (Exception e) {
@@ -123,7 +123,7 @@ public class DiaryService {
 
         try {
             Diary diary = diaryRepository
-                    .findByIdAndProviderAndProviderId(id, userInfo.provider(), userInfo.providerId())
+                    .findByIdAndUser_Id(id, userInfo.userId())
                     .orElse(null);
 
             if (diary == null) {
@@ -157,7 +157,7 @@ public class DiaryService {
         try {
 
             Diary diary = diaryRepository
-                    .findByIdAndProviderAndProviderId(id, userInfo.provider(), userInfo.providerId())
+                    .findByIdAndUser_Id(id, userInfo.userId())
                     .orElse(null);
 
             if (diary == null) {
